@@ -1,0 +1,32 @@
+UPDATE Employees
+SET Salary = Salary * 1.10
+WHERE Department = 'HR';
+
+UPDATE Employees
+SET Department = 'Senior IT'
+WHERE EmployeeID = (
+    SELECT EmployeeID
+    FROM Employees
+    WHERE Salary > 70000.00
+    LIMIT 1
+);
+
+DELETE FROM Employees e
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM EmployeeProjects ep
+    WHERE ep.EmployeeID = e.EmployeeID
+);
+
+
+BEGIN;
+INSERT INTO Projects (ProjectName, StartDate)
+VALUES ('Migration to PostgreSQL', CURRENT_DATE)
+RETURNING ProjectID;
+
+INSERT INTO EmployeeProjects (EmployeeID, ProjectID, HoursWorked)
+VALUES
+(1, currval(pg_get_serial_sequence('projects', 'projectid')), 40),
+(2, currval(pg_get_serial_sequence('projects', 'projectid')), 25);
+COMMIT;
+
