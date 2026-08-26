@@ -1,0 +1,45 @@
+SELECT p.ProjectName
+FROM Projects AS p
+JOIN EmployeeProjects AS ep
+    ON ep.ProjectID = p.ProjectID
+JOIN Employees AS e
+    ON e.EmployeeID = ep.EmployeeID
+WHERE e.FirstName = 'Bob'
+  AND e.LastName = 'Johnson'
+  AND ep.HoursWorked > 150;
+
+
+UPDATE Projects AS p
+SET Budget = Budget * 1.10
+WHERE EXISTS (
+    SELECT 1
+    FROM EmployeeProjects AS ep
+    JOIN Employees AS e
+        ON e.EmployeeID = ep.EmployeeID
+    WHERE ep.ProjectID = p.ProjectID
+      AND e.Department = 'IT'
+);
+
+
+UPDATE Projects
+SET EndDate = StartDate + INTERVAL '1 year'
+WHERE EndDate IS NULL;
+
+
+
+BEGIN;
+WITH new_employee AS (
+    INSERT INTO Employees (Employeeid, FirstName, LastName, Department, Salary)
+    VALUES (20,'Anna', 'Kuznetsova', 'Marketing', 58000.00)
+    RETURNING EmployeeID
+)
+INSERT INTO EmployeeProjects (EmployeeID, ProjectID, HoursWorked)
+SELECT
+    ne.EmployeeID,
+    p.ProjectID,
+    80
+FROM new_employee AS ne
+CROSS JOIN Projects AS p
+WHERE p.ProjectName = 'Website Redesign';
+COMMIT;
+

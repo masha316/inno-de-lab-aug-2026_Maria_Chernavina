@@ -1,0 +1,36 @@
+CREATE OR REPLACE FUNCTION CalculateAnnualBonus(
+    p_employee_id INT,
+    p_salary NUMERIC
+)
+RETURNS NUMERIC
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN p_salary * 0.10;
+END;
+$$;
+
+
+SELECT
+    EmployeeID,
+    FirstName,
+    LastName,
+    Salary,
+    CalculateAnnualBonus(EmployeeID, Salary) AS annual_bonus
+FROM Employees;
+
+
+CREATE OR REPLACE VIEW IT_Department_View AS
+SELECT
+    EmployeeID,
+    FirstName,
+    LastName,
+    Salary
+FROM Employees
+WHERE Department = 'IT';
+
+
+SELECT *
+FROM IT_Department_View;
+
+
